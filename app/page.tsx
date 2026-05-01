@@ -305,8 +305,8 @@ export default function TodoPage() {
 
         {/* Filters & List */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between px-2">
-            <div className="flex bg-white/40 backdrop-blur p-1 rounded-xl border border-white/40">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-2">
+            <div className="flex bg-white/40 backdrop-blur p-1 rounded-xl border border-white/40 self-start">
               {(["all", "pending", "completed"] as const).map((f) => (
                 <button
                   key={f}
@@ -320,14 +320,14 @@ export default function TodoPage() {
               ))}
             </div>
 
-            <div className="relative">
+            <div className="relative w-full sm:w-auto">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/60" />
               <input 
                 type="text"
-                placeholder="Search..."
+                placeholder="Search tasks..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 pr-4 py-1.5 bg-white/20 backdrop-blur rounded-full text-xs text-white placeholder:text-white/60 focus:outline-none focus:bg-white/30 transition-all w-24 sm:w-32 focus:w-40"
+                className="pl-9 pr-4 py-2.5 sm:py-1.5 bg-white/20 backdrop-blur rounded-xl sm:rounded-full text-sm sm:text-xs text-white placeholder:text-white/60 focus:outline-none focus:bg-white/30 transition-all w-full sm:w-32 focus:sm:w-48"
               />
             </div>
           </div>
@@ -393,18 +393,18 @@ export default function TodoPage() {
                       )}
                     </div>
 
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                       {!todo.completed && editingId !== todo.id && (
                         <button
-                          onClick={() => { startEditing(todo); playSound("click"); }}
-                          className="p-2 text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 rounded-xl transition-all"
+                          onClick={(e) => { e.stopPropagation(); startEditing(todo); playSound("click"); }}
+                          className="p-3 sm:p-2 text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 rounded-xl transition-all"
                         >
                           <Pencil className="w-4 h-4" />
                         </button>
                       )}
                       <button
-                        onClick={() => deleteTodo(todo.id)}
-                        className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
+                        onClick={(e) => { e.stopPropagation(); deleteTodo(todo.id); }}
+                        className="p-3 sm:p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
