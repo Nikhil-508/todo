@@ -39,6 +39,13 @@ const SOUNDS = {
   delete: "https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"
 };
 
+// Pre-instantiate audio objects for better performance on mobile
+const audioObjects: Record<string, HTMLAudioElement | null> = {
+  click: typeof Audio !== "undefined" ? new Audio(SOUNDS.click) : null,
+  success: typeof Audio !== "undefined" ? new Audio(SOUNDS.success) : null,
+  delete: typeof Audio !== "undefined" ? new Audio(SOUNDS.delete) : null,
+};
+
 export default function TodoPage() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [inputValue, setInputValue] = useState("");
@@ -51,6 +58,7 @@ export default function TodoPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [lastDeleted, setLastDeleted] = useState<Todo | null>(null);
   const [showUndo, setShowUndo] = useState(false);
+  const [audioUnlocked, setAudioUnlocked] = useState(false);
 
   // Load from local storage
   useEffect(() => {
@@ -73,10 +81,29 @@ export default function TodoPage() {
   }, [todos, isMounted]);
 
   const playSound = useCallback((type: keyof typeof SOUNDS) => {
-    const audio = new Audio(SOUNDS[type]);
-    audio.volume = 0.2;
-    audio.play().catch(() => {});
+    const audio = audioObjects[type];
+    if (audio) {
+      audio.currentTime = 0; // Reset to start
+      audio.volume = 0.4; // Slightly louder for mobile
+      audio.play().catch((e) => console.log("Audio play blocked:", e));
+    }
   }, []);
+
+  // iOS Audio Unlock: Trigger on first interaction
+  const unlockAudio = useCallback(() => {
+    if (audioUnlocked) return;
+    
+    Object.values(audioObjects).forEach(audio => {
+      if (audio) {
+        audio.play().then(() => {
+          audio.pause();
+          audio.currentTime = 0;
+        }).catch(() => {});
+      }
+    });
+    
+    setAudioUnlocked(true);
+  }, [audioUnlocked]);
 
   // Aura Themes Logic
   const auraTheme = useMemo(() => {
@@ -180,7 +207,10 @@ export default function TodoPage() {
   if (!isMounted) return null;
 
   return (
-    <main className={`min-h-screen bg-gradient-to-br ${auraTheme} flex flex-col items-center py-12 px-4 sm:px-6 transition-colors duration-1000`}>
+    <main 
+      onClick={unlockAudio}
+      className={`min-h-screen bg-gradient-to-br ${auraTheme} flex flex-col items-center py-12 px-4 sm:px-6 transition-colors duration-1000`}
+    >
       <div className="max-w-md w-full space-y-8">
         
         {/* Progress & Header */}
