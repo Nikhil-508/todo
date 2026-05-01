@@ -14,8 +14,7 @@
 
 @layer base {
   body {
-    background: radial-gradient(circle at top left, #fdfcfb 0%, #e2d1c3 100%);
-    background-attachment: fixed;
+    background-color: #f8fafc;
     color: var(--foreground);
     @apply antialiased selection:bg-indigo-100 selection:text-indigo-900;
   }
